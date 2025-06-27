@@ -58,7 +58,7 @@
       animation: cloudMove 60s linear infinite;
       z-index: 1;
     }
-    
+
     .cloud:nth-child(2) {
       top: 120px;
       width: 90px;
@@ -79,7 +79,7 @@
       animation: birdFly 18s linear infinite;
       z-index: 4;
     }
-    
+
     .bird:before, .bird:after {
       content: '';
       position: absolute;
@@ -90,17 +90,17 @@
       top: 8px;
       transform-origin: center;
     }
-    
+
     .bird:before {
       left: 0;
       transform: rotate(30deg);
     }
-    
+
     .bird:after {
       left: 20px;
       transform: rotate(-30deg);
     }
-    
+
     .bird:nth-child(5) {
       top: 160px;
       animation-delay: 8s;
@@ -156,7 +156,7 @@
       gap: 0.6rem;
       position: relative;
     }
-    
+
     .header-text:before {
       content: '';
       position: absolute;
@@ -169,7 +169,7 @@
       background-repeat: no-repeat;
       transform: rotate(180deg);
     }
-    
+
     .header-text img {
       width: 50px;
       height: 50px;
@@ -274,7 +274,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .btn-primary:hover {
       background-color: #519657;
       border-color: #519657;
@@ -321,7 +321,7 @@
       .digital-clock {
         font-size: 1.1rem;
       }
-      
+
       .header-text {
         font-size: 1.8rem;
       }
@@ -353,7 +353,7 @@
           <div id="timeWITA" class="digital-clock mb-2"></div>
           <div id="timeWIT" class="digital-clock mb-2"></div>
           <button id="toggleVisualTime" class="btn btn-outline-success w-100 mb-3">Tampilkan Waktu Visual</button>
-          
+
           <canvas id="clockCanvas" width="250" height="250"></canvas>
         </div>
       </div>
@@ -366,7 +366,11 @@
         </div>
         <div class="card p-4 shadow animate__animated animate__fadeInRight">
           <div class="form-container">
-            <form method="POST" action="/add" novalidate>
+
+            <!-- ================================================= -->
+            <!-- PERBAIKAN DI SINI: MENGGUNAKAN ROUTE HELPER       -->
+            <!-- ================================================= -->
+            <form method="POST" action="{{ route('admin.add') }}" novalidate>
               @csrf
               <div class="mb-4">
                 <label for="name" class="form-label">Nama Tempat</label>
@@ -456,7 +460,7 @@
     const toggleBtn = document.getElementById('toggleVisualTime');
     const canvas = document.getElementById('clockCanvas');
     let showVisual = false;
-    
+
     toggleBtn.addEventListener('click', () => {
       showVisual = !showVisual;
       canvas.style.display = showVisual ? 'block' : 'none';
@@ -498,7 +502,7 @@
       ctx.font = radius * 0.15 + "px Diastema, serif";
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
-      
+
       for (let num = 1; num <= 12; num++) {
         const angle = num * Math.PI / 6;
         ctx.rotate(angle);

@@ -1,34 +1,44 @@
 <?php
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
+use App\Models\Place;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\WebLoginController;
+use App\Http\Controllers\Admin\PlaceController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\LogoutController;
 
-Route::get('/', function () {
-    $places = Http::get('http://127.0.0.1:8000/api/places')->json();
-    return view('admin.home', compact('places')); // ini kunci pentingnya
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// --- Rute Publik untuk Login ---
+Route::get('/admin/login', fn() => view('admin.login'))->name('login');
+Route::post('/admin/login', [WebLoginController::class, 'login']);
+
+// --- Grup Route Admin yang Terproteksi Sesi ---
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+
+    // Menggunakan Controller untuk Places
+    Route::get('/', [PlaceController::class, 'index'])->name('home');
+    Route::get('/add', [PlaceController::class, 'create'])->name('add');
+    Route::post('/add', [PlaceController::class, 'store']);
+    Route::get('/places/{place}', [PlaceController::class, 'show'])->name('places.show');
+    Route::delete('/delete/{place}', [PlaceController::class, 'destroy'])->name('delete');
+
+    // === DUA ROUTE BARU UNTUK FITUR EDIT DITAMBAHKAN DI SINI ===
+    Route::get('/places/{place}/edit', [PlaceController::class, 'edit'])->name('places.edit');
+    Route::put('/places/{place}', [PlaceController::class, 'update'])->name('places.update');
+
+    // Menggunakan Controller untuk Bookings
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings');
+    Route::put('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.status');
+
+    // Route untuk Logout
+    Route::post('/logout', LogoutController::class)->name('logout');
 });
 
-Route::get('/add', fn() => view('admin.add'));
-
-Route::post('/add', function (\Illuminate\Http\Request $request) {
-    Http::post('http://127.0.0.1:8000/api/places', $request->all());
-    return redirect('/')->with('success', 'Tempat ditambahkan');
-});
-
-Route::delete('/delete/{id}', function ($id) {
-    Http::delete("http://127.0.0.1:8000/api/places/{$id}");
-    return redirect('/')->with('success', 'Tempat dihapus');
-});
-
-Route::get('/bookings', function () {
-    $bookings = Http::get('http://127.0.0.1:8000/api/bookings')->json();
-    return view('admin.bookings', compact('bookings'));
-});
-
-Route::put('/bookings/{id}/status', function (\Illuminate\Http\Request $request, $id) {
-    Http::put("http://127.0.0.1:8000/api/bookings/{$id}", [
-        'status' => $request->input('status')
-    ]);
-    return redirect('/bookings')->with('success', 'Status booking diperbarui');
-});
-
+// Redirect dari root ke dashboard admin jika sudah login
+Route::get('/', fn() => redirect('/admin'))->middleware('auth');
